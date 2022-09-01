@@ -16,4 +16,8 @@ export class TasksDTO {
 
   @IsString()
   status: 'todo' | 'inprogress' | 'done';
+
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 }

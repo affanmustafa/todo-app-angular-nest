@@ -26,11 +26,6 @@ export class TasksService {
         id: taskId,
       },
     });
-
-    // if (!foundTask) {
-    //   throw new NotFoundException('Task not found');
-    // }
-    // return foundTask;
   }
 
   async update(taskId: number, updateTaskDto: UpdateTasksDTO): Promise<Tasks> {

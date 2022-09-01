@@ -15,10 +15,17 @@ model Tasks {
   title String
   description String?
   status String
+  user Users @relation(fields: [userId], references: [username])
+  userId String
+
+  @@map("tasks")
 }
 
 model Users {
-  id Int @unique @default(autoincrement())
+  username String @unique
   name String
   email String?
+  tasks Tasks[]
+
+  @@map("users")
 }

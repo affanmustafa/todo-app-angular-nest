@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class UpdateTasksDTO {
   @IsNumber()
@@ -7,13 +7,17 @@ export class UpdateTasksDTO {
 
   @IsString()
   @IsOptional()
-  title: string;
+  title?: string;
 
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
 
   @IsString()
   @IsOptional()
-  status: 'todo' | 'inprogress' | 'done';
+  status?: 'todo' | 'inprogress' | 'done';
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 }
