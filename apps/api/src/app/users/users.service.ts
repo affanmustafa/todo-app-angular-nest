@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaClient, Users } from '@prisma/client';
 
+import * as argon from 'argon2';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
@@ -9,8 +10,17 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto): Promise<Users> {
-    return prisma.users.create({ data: createUserDto });
+  async create(createUserDto: CreateUserDto): Promise<Users> {
+    const hashedPass = await argon.hash(createUserDto.password);
+    console.log(hashedPass);
+    return prisma.users.create({
+      data: {
+        username: createUserDto.username,
+        password: hashedPass,
+        name: createUserDto.name,
+        email: createUserDto.email,
+      },
+    });
   }
 
   findAll(): Promise<Users[]> {

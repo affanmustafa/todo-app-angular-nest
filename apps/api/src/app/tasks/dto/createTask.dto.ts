@@ -11,8 +11,7 @@ export class TasksDTO {
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  description?: string;
 
   @IsString()
   status: 'todo' | 'inprogress' | 'done';
