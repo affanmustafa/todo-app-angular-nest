@@ -1,14 +1,32 @@
 version: '3.8'
 services:
-  todo-db:
-    image: postgres:13
-    ports:
-      - 5434:5432
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: todoapp-db
+  api:
+    container_name: todoapp-api
     networks:
-      - todoapp-api-network
+      - nestjs-crud
+      - postgres-db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3333:3333
+
+  postgresdb:
+    image: postgres:13.5
+    networks:
+      - postgres-db
+    restart: always
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  postgres:
+
 networks:
-  todoapp-api-network:
+  nestjs-crud:
+  postgres-db:
