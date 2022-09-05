@@ -21,11 +21,17 @@ export class TasksService {
   }
 
   findOne(taskId: number): Promise<Tasks> {
-    return prisma.tasks.findFirst({
+    const taskFind = prisma.tasks.findFirst({
       where: {
         id: taskId,
       },
     });
+
+    if (!taskFind) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return taskFind;
   }
 
   async update(taskId: number, updateTaskDto: UpdateTasksDTO): Promise<Tasks> {

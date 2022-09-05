@@ -28,7 +28,7 @@ export class UsersService {
   }
 
   findOne(uname: string): Promise<Users> {
-    return prisma.users.findUnique({
+    const userFind = prisma.users.findUnique({
       where: {
         username: uname,
       },
@@ -36,6 +36,10 @@ export class UsersService {
         tasks: true,
       },
     });
+    if (!userFind) {
+      throw new NotFoundException('User not found');
+    }
+    return userFind;
   }
 
   async update(uname: string, updateUserDto: UpdateUserDTO): Promise<Users> {
