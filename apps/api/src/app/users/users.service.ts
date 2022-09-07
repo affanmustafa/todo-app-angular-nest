@@ -10,6 +10,12 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
+  //HELLO for spec.ts
+  helloMessage(): string {
+    return 'Welcome to Users Service';
+  }
+
+  //POST
   async create(createUserDto: CreateUserDto): Promise<Users> {
     const hashedPass = await argon.hash(createUserDto.password);
     console.log(hashedPass);
@@ -23,10 +29,12 @@ export class UsersService {
     });
   }
 
+  //GET All
   findAll(): Promise<Users[]> {
     return prisma.users.findMany();
   }
 
+  //GET by Username
   findOne(uname: string): Promise<Users> {
     const userFind = prisma.users.findUnique({
       where: {
@@ -42,6 +50,7 @@ export class UsersService {
     return userFind;
   }
 
+  //PATCH update one user
   async update(uname: string, updateUserDto: UpdateUserDTO): Promise<Users> {
     const updateUser = await prisma.users.findUnique({
       where: {
@@ -63,6 +72,7 @@ export class UsersService {
     });
   }
 
+  //DELETE one user
   async remove(uname: string): Promise<Users> {
     const deleteUser = await prisma.users.findUnique({
       where: {

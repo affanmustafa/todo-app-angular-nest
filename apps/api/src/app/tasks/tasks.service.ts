@@ -8,6 +8,8 @@ import { PrismaClient, Tasks } from '@prisma/client';
 import { TasksDTO } from './dto/createTask.dto';
 import { UpdateTasksDTO } from './dto/updateTask.dto';
 
+import { UsersService } from '../users/users.service';
+
 const prisma = new PrismaClient();
 
 @Injectable()
