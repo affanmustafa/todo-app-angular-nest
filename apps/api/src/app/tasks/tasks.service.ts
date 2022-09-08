@@ -8,13 +8,19 @@ import { PrismaClient, Tasks } from '@prisma/client';
 import { TasksDTO } from './dto/createTask.dto';
 import { UpdateTasksDTO } from './dto/updateTask.dto';
 
-import { UsersService } from '../users/users.service';
-
 const prisma = new PrismaClient();
 
 @Injectable()
 export class TasksService {
   create(newTask: TasksDTO) {
+    const userFind = prisma.users.findUnique({
+      where: {
+        username: newTask.userId,
+      },
+    });
+    if (!userFind) {
+      throw new NotFoundException('User for task creation not found');
+    }
     return prisma.tasks.create({ data: newTask });
   }
 

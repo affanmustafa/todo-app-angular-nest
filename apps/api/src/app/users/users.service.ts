@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaClient, Users } from '@prisma/client';
 
@@ -10,16 +14,13 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
-  //HELLO for spec.ts
-  helloMessage(): string {
-    return 'Welcome to Users Service';
-  }
-
-  //POST
   async create(createUserDto: CreateUserDto): Promise<Users> {
+    const existingUser = await this.findOne(createUserDto.username);
+    if (existingUser) {
+      throw new ConflictException('Username already exists');
+    }
     const hashedPass = await argon.hash(createUserDto.password);
-    console.log(hashedPass);
-    return prisma.users.create({
+    const createdUser = prisma.users.create({
       data: {
         username: createUserDto.username,
         password: hashedPass,
@@ -27,14 +28,13 @@ export class UsersService {
         email: createUserDto.email,
       },
     });
+    return createdUser;
   }
 
-  //GET All
   findAll(): Promise<Users[]> {
     return prisma.users.findMany();
   }
 
-  //GET by Username
   findOne(uname: string): Promise<Users> {
     const userFind = prisma.users.findUnique({
       where: {
@@ -50,7 +50,6 @@ export class UsersService {
     return userFind;
   }
 
-  //PATCH update one user
   async update(uname: string, updateUserDto: UpdateUserDTO): Promise<Users> {
     const updateUser = await prisma.users.findUnique({
       where: {
@@ -62,6 +61,14 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    await prisma.tasks.updateMany({
+      where: {
+        userId: uname,
+      },
+      data: {
+        userId: uname,
+      },
+    });
     return prisma.users.update({
       where: {
         username: uname,
@@ -72,7 +79,6 @@ export class UsersService {
     });
   }
 
-  //DELETE one user
   async remove(uname: string): Promise<Users> {
     const deleteUser = await prisma.users.findUnique({
       where: {
