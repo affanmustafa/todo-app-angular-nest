@@ -18,5 +18,6 @@ export class CreateUserDto {
   @IsOptional()
   email: string;
 
+  @IsOptional()
   tasks: Tasks[];
 }

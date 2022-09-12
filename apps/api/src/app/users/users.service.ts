@@ -14,18 +14,23 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
+  helloWorld(): string {
+    return 'Hello World!';
+  }
+
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const existingUser = await this.findOne(createUserDto.username);
+    const existingUser = await prisma.users.findUnique({
+      where: {
+        username: createUserDto.username,
+      },
+    });
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
-    const hashedPass = await argon.hash(createUserDto.password);
+    //const hashedPass = await argon.hash(createUserDto.password);
     const createdUser = prisma.users.create({
       data: {
-        username: createUserDto.username,
-        password: hashedPass,
-        name: createUserDto.name,
-        email: createUserDto.email,
+        ...createUserDto,
       },
     });
     return createdUser;
@@ -35,8 +40,8 @@ export class UsersService {
     return prisma.users.findMany();
   }
 
-  findOne(uname: string): Promise<Users> {
-    const userFind = prisma.users.findUnique({
+  async findOne(uname: string): Promise<Users> {
+    const userFind = await prisma.users.findUnique({
       where: {
         username: uname,
       },
@@ -79,7 +84,7 @@ export class UsersService {
     });
   }
 
-  async remove(uname: string): Promise<Users> {
+  async remove(uname: string): Promise<{ deleted: boolean }> {
     const deleteUser = await prisma.users.findUnique({
       where: {
         username: uname,
@@ -90,10 +95,11 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return prisma.users.delete({
+    await prisma.users.delete({
       where: {
         username: uname,
       },
     });
+    return { deleted: true };
   }
 }

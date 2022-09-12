@@ -12,8 +12,8 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class TasksService {
-  create(newTask: TasksDTO) {
-    const userFind = prisma.users.findUnique({
+  async create(newTask: TasksDTO) {
+    const userFind = await prisma.users.findUnique({
       where: {
         username: newTask.userId,
       },
@@ -28,8 +28,8 @@ export class TasksService {
     return prisma.tasks.findMany();
   }
 
-  findOne(taskId: number): Promise<Tasks> {
-    const taskFind = prisma.tasks.findFirst({
+  async findOne(taskId: number): Promise<Tasks> {
+    const taskFind = await prisma.tasks.findFirst({
       where: {
         id: taskId,
       },

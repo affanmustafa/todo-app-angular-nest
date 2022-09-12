@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class UpdateTasksDTO {
   @IsString()
