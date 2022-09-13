@@ -15,6 +15,6 @@ export class UpdateTasksDTO {
   status?: TaskStatus;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   userId: string;
 }
