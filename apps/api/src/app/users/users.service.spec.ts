@@ -1,17 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 import { UsersService } from './users.service';
-
-const newUserTest: CreateUserDto = {
-  username: 'kang',
-  name: 'Kang The Conqueror',
-  password: 'marvel',
-  email: 'kang@conqueror.com',
-  tasks: [],
-};
 
 const usersMany = [
   {
@@ -47,9 +38,16 @@ const db = {
   remove: jest.fn().mockResolvedValue(oneUser),
 };
 
+class Argon2Mock {
+  public hash = jest.fn().mockReturnValue('hash');
+  public verify = jest.fn().mockReturnValue(true);
+}
+
 describe('UsersService', () => {
   let service: UsersService;
   let prisma: PrismaService;
+
+  let argon2: Argon2Mock;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,11 +57,24 @@ describe('UsersService', () => {
           provide: PrismaService,
           useValue: db,
         },
+        {
+          provide: 'argon2',
+          useClass: Argon2Mock,
+        },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     prisma = module.get<PrismaService>(PrismaService);
+    argon2 = module.get<Argon2Mock>('argon2');
+
+    const newUserTest: CreateUserDto = {
+      username: 'kang',
+      name: 'Kang The Conqueror',
+      password: await argon2.hash('123'),
+      email: 'kang@conqueror.com',
+      tasks: [],
+    };
   });
 
   it('should be defined', () => {
@@ -72,8 +83,8 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return all users', async () => {
-      const usersAll = await service.findAll();
-      expect(usersAll).toEqual(usersMany);
+      const usersAll = service.findAll();
+      expect(usersAll).resolves.toEqual(usersMany);
     });
   });
   describe('getOne', () => {
@@ -82,12 +93,25 @@ describe('UsersService', () => {
     });
   });
   describe('createOne', () => {
-    it('should successfully create a new user', () => {
+    it('should successfully create a new user', async () => {
+      //Mock argon2 hashing for new user
+      const hashedPassword = await argon2.hash.mockReturnValue(
+        'hashedPassword'
+      );
+      console.log(hashedPassword);
+      //Sample new user for test
+      const newUserTest: CreateUserDto = {
+        username: 'kang',
+        name: 'Kang The Conqueror',
+        password: argon2.hash('123'),
+        email: 'kang@conqueror.com',
+        tasks: [],
+      };
       expect(
         service.create({
           username: 'kang',
           name: 'Kang The Conqueror',
-          password: 'marvel',
+          password: argon2.hash('123'),
           email: 'kang@conqueror.com',
           tasks: [],
         })

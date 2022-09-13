@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { TaskStatus } from '@prisma/client';
 
 export class UpdateTasksDTO {
   @IsString()
@@ -11,7 +12,7 @@ export class UpdateTasksDTO {
 
   @IsString()
   @IsOptional()
-  status?: 'todo' | 'inprogress' | 'done';
+  status?: TaskStatus;
 
   @IsString()
   @IsNotEmpty()

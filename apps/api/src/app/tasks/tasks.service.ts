@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient, Tasks } from '@prisma/client';
+import { PrismaClient, Tasks, TaskStatus } from '@prisma/client';
 
 import { TasksDTO } from './dto/createTask.dto';
 import { UpdateTasksDTO } from './dto/updateTask.dto';
@@ -20,6 +20,15 @@ export class TasksService {
     });
     if (!userFind) {
       throw new NotFoundException('User for task creation not found');
+    }
+    if (
+      newTask.status != TaskStatus.todo &&
+      newTask.status != TaskStatus.inprogress &&
+      newTask.status != TaskStatus.done
+    ) {
+      throw new NotFoundException(
+        `status must be 'done', 'inprogress', or 'todo'`
+      );
     }
     return prisma.tasks.create({ data: newTask });
   }

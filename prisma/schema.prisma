@@ -14,7 +14,7 @@ model Tasks {
   id Int @unique @default(autoincrement())
   title String
   description String?
-  status String
+  status TaskStatus
   user Users @relation(fields: [userId], references: [username], onDelete: Cascade)
   userId String
 
@@ -29,4 +29,10 @@ model Users {
   tasks Tasks[]
 
   @@map("users")
+}
+
+enum TaskStatus {
+  todo
+  inprogress
+  done
 }

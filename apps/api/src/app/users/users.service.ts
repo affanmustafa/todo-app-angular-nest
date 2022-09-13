@@ -1,19 +1,22 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { PrismaClient, Users } from '@prisma/client';
 
-import * as argon from 'argon2';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+
+import { Argon2 } from '../common/providers/argon2.module';
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
+  public constructor(@Inject('argon2') private readonly argon2: Argon2) {}
   helloWorld(): string {
     return 'Hello World!';
   }
@@ -27,13 +30,15 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
-    //const hashedPass = await argon.hash(createUserDto.password);
-    const createdUser = prisma.users.create({
+    const hashedPass = await this.argon2.hash(createUserDto.password);
+    return prisma.users.create({
       data: {
-        ...createUserDto,
+        username: createUserDto.username,
+        password: hashedPass,
+        name: createUserDto.name,
+        email: createUserDto.email,
       },
     });
-    return createdUser;
   }
 
   findAll(): Promise<Users[]> {
